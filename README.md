@@ -27,30 +27,29 @@ notebooks/
 
 ## Model and assumptions
 
-- **Background cosmology:**
+- **Background cosmology:**  
   `FLRW.E(z)` implements $E(z)^2 = \Omega_m(1+z)^3 + \Omega_k(1+z)^2 + \Omega_\Lambda$ with $\Omega_k = 1-\Omega_m-\Omega_\Lambda$
   
-- **Absolute-magnitude zero point $M$ is marginalized analytically**. 
+- **Absolute-magnitude zero point $M$ is marginalized analytically**.  
   Assuming a flat improper prior on $M$, $\chi^2(\Omega_m,\Omega_\Lambda) = A - B^2/D$, where $A = d^TC^{-1}d$, $B = d^TC^{-1}\mathbf{1}$, $D = \mathbf{1}^TC^{-1}\mathbf{1}$, and $d = \mu_\mathrm{obs} - \mu_\mathrm{th}$.
   
-- **$H_0$ is fixed.**
-  `Likelihood` takes `H0=70.0` by default. $D_M \propto c/H_0$. Changing $H_0$ rescales $\mu_\mathrm{th}$ by the same additive constant independent on z:
-  $\mu_\mathrm{th}(z;\Omega_m,\Omega_\Lambda,H_0) = \mu_\mathrm{th}(z;\Omega_m,\Omega_\Lambda,H_0^\mathrm{ref}) + 5\log_{10}(H_0^\mathrm{ref}/H_0)$.
-  Substituting $d \to d - c\mathbf{1}$ for any $c$ into $\chi^2 = A - B^2/D$ (with $A,B,D$ as defined above) leaves it unchanged: for every value of $H_0$, the surface $\chi^2(\Omega_m,\Omega_{\Lambda})$ is the same; 
-  Therefore, the `H0=70.0` choice does not affect the fitted $(\Omega_m,\Omega_{\Lambda})$.
+- **$H_0$ is fixed.**  
+  `Likelihood` takes `H0=70.0` by default. $D_M \propto c/H_0$. Changing $H_0$ rescales $\mu_\mathrm{th}$ by the same additive constant independent on z:  
+  $\mu_\mathrm{th}(z;\Omega_m,\Omega_\Lambda,H_0) = \mu_\mathrm{th}(z;\Omega_m,\Omega_\Lambda,H_0^\mathrm{ref}) + 5\log_{10}(H_0^\mathrm{ref}/H_0)$.  
+  Substituting $d \to d - c\mathbf{1}$ for any $c$ into $\chi^2 = A - B^2/D$ (with $A,B,D$ as defined above) leaves it unchanged: for every value of $H_0$, the surface $\chi^2(\Omega_m,\Omega_{\Lambda})$ is the same; Therefore, the `H0=70.0` choice does not affect the fitted $(\Omega_m,\Omega_{\Lambda})$.  
+    
+- **Inverse covariances are obtained via Cholesky factor.**  
+  `cho_factor` computes $C = LL^T$, the Cholesky decomposition of the covariance matrix (which is symmetric positive-definite).  
+  $C^{-1}$ applied to a vector $v$ — e.g. $C^{-1}d$ or $C^{-1}\mathbf{1}$ — is then obtained by `cho_solve`, which solves:  
+  $Ly = v$ by forward substitution (top row is solved first and since $L$ is lower triangular, row $i$ only involves $y_1,\dots,y_i$, so $y_i = \left(v_i - \sum_{j<i} L_{ij}y_j\right)/L_{ii}$ is computed one at a time in order, each $y_i$ using only the $y_j$'s already found)  
+  and $L^Tx = y$ by back substitution (bottom row is solver first and since $L^T$ is upper triangular, row $i$ only involves $x_i,\dots,x_n$, so $x_i = \left(y_i - \sum_{j>i} L^T_{ij}x_j\right)/L^T_{ii}$ is computed from $x_n$ down to $x_1$), giving $x = C^{-1}v$.  
+    
+- **Flat priors**  
+  defined by user-specified bounds on $\Omega_m$ and $\Omega_{\Lambda}$ independently (`flat_log_prior`)  
   
-- **Inverse covariances are obtained via Cholesky factor.**
-  `cho_factor` computes $C = LL^T$, the Cholesky decomposition of the covariance matrix (which is symmetric positive-definite). 
-  $C^{-1}$ applied to a vector $v$ — e.g. $C^{-1}d$ or $C^{-1}\mathbf{1}$ — is then obtained by `cho_solve`, which solves
-  $Ly = v$ by forward substitution (top row is solved first and since $L$ is lower triangular, row $i$ only involves $y_1,\dots,y_i$, so $y_i = \left(v_i - \sum_{j<i} L_{ij}y_j\right)/L_{ii}$ is computed one at a time in order, each $y_i$ using only the $y_j$'s already found)
-  and $L^Tx = y$ by back substitution (bottom row is solver first and since $L^T$ is upper triangular, row $i$ only involves $x_i,\dots,x_n$, so $x_i = \left(y_i - \sum_{j>i} L^T_{ij}x_j\right)/L^T_{ii}$ is computed from $x_n$ down to $x_1$), giving $x = C^{-1}v$.
-  
-- **Flat priors**
-  defined by user-specified bounds on $\Omega_m$ and $\Omega_{\Lambda}$ independently (`flat_log_prior`)
-  
-- **Proposal tuning (warm-up)**:
+- **Proposal tuning (warm-up)**:  
   `TuneProp.tune_proposal` runs short MCMC chains from one starting point (chosen near the fiducial values ($\Omega_m$, $\Omega_{\Lambda}$) = (0.3, 0.7)). 
-  Each round:
+  Each round:  
   1. re-estimates the proposal's covariance from that round's final half (post-transient)
      samples (picking up the $\Omega_m$/$\Omega_{\Lambda}$ correlation),
   2. regularises it with a small `jitter * I` before the Cholesky factorisation,
@@ -58,10 +57,10 @@ notebooks/
 
   The last round's proposal is frozen and used for every chain
   
-- **Convergence**
-  values considered for the assumption of convergence for the parameters are split-$\hat R < 1.01$, $\mathrm{ESS} \geq 200$, and acceptance rate within $[0.15, 0.5]$;
-This is checked by `convergence_report`. If any parameter fails the convergence checks, `run_mcmc.py` exits with a non-zero status.
-
+- **Convergence**  
+  values considered for the assumption of convergence for the parameters are split-$\hat R < 1.01$, $\mathrm{ESS} \geq 200$, and acceptance rate within $[0.15, 0.5]$;  
+This is checked by `convergence_report`. If any parameter fails the convergence checks, `run_mcmc.py` exits with a non-zero status.  
+  
 
 ## Data structure
 
