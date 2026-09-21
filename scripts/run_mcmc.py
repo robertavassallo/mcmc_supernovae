@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import qmc
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts.dataset import load_union21
+from lib.dataset import load_union21
 from lib.bayes import MetropolisHastings, Posterior, Likelihood, flat_log_prior, TuneProp
 from lib.diagnostics import convergence_report
 

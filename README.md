@@ -10,19 +10,20 @@ $\Omega_k = 1 - \Omega_m - \Omega_\Lambda$.
 lib/
   cosmology.py     FLRW(H0, omega_m, omega_lambda): E(z), comoving/transverse/
                     luminosity distance, distance modulus mu(z)
+  dataset.py       SNDataset, load_union21: loads mu_z.txt and the data covariance matrix
   bayes.py         Posterior, Likelihood (analytic M-marginalisation), flat_log_prior,
                     GaussianRandomWalk proposal, MetropolisHastings sampler,
                     TuneProp.tune_proposal (pilot-tunes and freezes the proposal)
   diagnostics.py   autocorrelation/ESS, split-Rhat, power-spectrum (Dunkley) fit,
                     convergence_report, trace/acceptance plots
 scripts/
-  dataset.py       loads mu_z.txt and data covariance matrix
   run_mcmc.py      end-to-end Union2.1 analysis
 data/
   mu_z.txt             name, z, mu, sigma_mu (Union2.1 compilation, 580 SNe)
   cov_matrix_sist.txt  statistical and systematic covariance (used by default)
 notebooks/
   acceptance_tests.ipynb   acceptance tests and analysis notebook
+pyproject.toml     packages lib as an installable library 
 ```
 
 ## Model and assumptions
@@ -76,7 +77,17 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt   # numpy, scipy, matplotlib, pytest
 ```
 
-## Testing
+### Installation of `lib` as a library
+
+`lib` is a installable package (`pyproject.toml`), with no dependency
+on `scripts/` — install it in editable mode to make `import lib.cosmology`,
+`lib.bayes`, `lib.dataset`, `lib.diagnostics` available from anywhere:
+
+```bash
+pip install -e .
+```
+
+## Tests
 
 Tests are performed in `notebooks/acceptance_tests.ipynb` in the following order:
 

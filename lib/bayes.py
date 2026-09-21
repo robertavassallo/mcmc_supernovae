@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from scipy.linalg import cho_factor, cho_solve
 
 from lib.cosmology import FLRW
-from scripts.dataset import SNDataset
+from lib.dataset import SNDataset
 
 class Posterior:
     def __init__(
