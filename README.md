@@ -20,7 +20,7 @@ scripts/
   run_mcmc.py      end-to-end Union2.1 analysis
 data/
   mu_z.txt             name, z, mu, sigma_mu (Union2.1 compilation, 580 SNe)
-  cov_matrix_sist.txt  statistical and systematic covariance (used by default)
+  cov_matrix_sist.txt  statistical and systematic covariance
 notebooks/
   acceptance_tests.ipynb   acceptance tests and analysis notebook
 pyproject.toml     packages lib as an installable library 
@@ -46,7 +46,7 @@ pyproject.toml     packages lib as an installable library
   and $L^Tx = y$ by back substitution (bottom row is solver first and since $L^T$ is upper triangular, row $i$ only involves $x_i,\dots,x_n$, so $x_i = \left(y_i - \sum_{j>i} L^T_{ij}x_j\right)/L^T_{ii}$ is computed from $x_n$ down to $x_1$), giving $x = C^{-1}v$.  
     
 - **Flat priors**  
-  defined by user-specified bounds on $\Omega_m$ and $\Omega_{\Lambda}$ independently (`flat_log_prior`)  
+  defined by specified bounds on $\Omega_m$ and $\Omega_{\Lambda}$ independently (`flat_log_prior`)  
   
 - **Proposal tuning (warm-up)**:  
   `TuneProp.tune_proposal` runs short MCMC chains from one starting point (chosen near the fiducial values ($\Omega_m$, $\Omega_{\Lambda}$) = (0.3, 0.7)). 
@@ -79,8 +79,8 @@ pip install -r requirements.txt   # numpy, scipy, matplotlib, pytest
 
 ### Installation of `lib` as a library
 
-`lib` is a installable package (`pyproject.toml`), with no dependency
-on `scripts/` — install it in editable mode to make `import lib.cosmology`,
+`lib` is a installable package (`pyproject.toml`)  
+install it in editable mode to make `import lib.cosmology`,
 `lib.bayes`, `lib.dataset`, `lib.diagnostics` available from anywhere:
 
 ```bash
@@ -92,9 +92,9 @@ pip install -e .
 Tests are performed in `notebooks/acceptance_tests.ipynb` in the following order:
 
 1. **Cosmology core:** $E(0)=1$, low-$z$ Hubble law, $D_M=\chi$ at $\Omega_k=0$, and $D_L=(1+z)^2D_A$ identity.
-2. **Bayesian core:** checks if sampler recovers a known Gaussian target's mean/covariance and is reproducible given a seed.
+2. **Bayesian core:** checks if sampler recovers a known Gaussian target's mean and covariance and is reproducible given a seed.
 3. **Union2.1 analysis:** checks covariance dimensions/positive-definiteness, $\chi^2$/N for near fiducial parameters, proposal tuning, and dispersed chains.
-4. **Convergence report:** trace/acceptance/windowed-mean plots, split-$\hat R$/ESS/acceptance-rate checks, Dunkley power-spectrum diagnostic, and the final $(\Omega_m,\Omega_\Lambda)$ corner plot with median $\pm$ 68% errors.
+4. **Convergence report:** trace,acceptance and windowed-mean plots, split-$\hat R$/ESS/acceptance-rate checks, Dunkley power-spectrum diagnostic, and the final $(\Omega_m,\Omega_\Lambda)$ corner plot with median $\pm$ 68% errors.
 
 ## Usage: `scripts/run_mcmc.py`
 
@@ -109,10 +109,10 @@ python scripts/run_mcmc.py \
 | Argument | Meaning |
 |---|---|
 | `--prior_range` | Flat-prior bounds, as 4 floats: `Omegam_min Omegam_max Omegal_min Omegal_max` |
-| `--nsteps` | Number of MCMC steps per chain (after the frozen proposal is in hand) |
+| `--nsteps` | Number of MCMC steps per chain |
 | `--nchains` | Number of dispersed chains |
 | `--burnin` | Steps discarded from the start of every chain before the convergence check |
-| `--save_path` | Where to save the corner plot (default: `corner_plot_om<value>_ol<value>.png` in the current directory) |
+| `--save_path` | Path to save the corner plot (default: `corner_plot_om<value>_ol<value>.png` in the current directory) |
 
 What it does:
 
