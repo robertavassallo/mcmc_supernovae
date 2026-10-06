@@ -54,7 +54,8 @@ class Likelihood:
 
     def distance_modulus_model(self, omega_m: float, omega_lambda: float) -> np.ndarray:
         model = FLRW(self.H0, omega_m, omega_lambda)
-        return model.mu(self.data.z) #function mu calculated for z vals from dataset
+        with np.errstate(invalid="ignore", divide="ignore"):
+            return model.mu(self.data.z) #function mu calculated for z vals from dataset
 
     def chi2(self, omega_m: float, omega_lambda: float) -> float:
         """Chi-square, minimised analytically over the zero-point M.
