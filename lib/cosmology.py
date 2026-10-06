@@ -70,7 +70,7 @@ class FLRW:
 
     def mu(self, z):
         """Distance modulus mu(z) = 5 log10(D_L[Mpc]) + 25 in magnitudes."""
-        return 5*np.log10(self.D_L(z)) + 25
+        return 5*np.log10(np.abs(self.D_L(z))) + 25
 
     def dV_dz_dOmega(self, z):
         """Comoving volume element: comoving volume lying in 
